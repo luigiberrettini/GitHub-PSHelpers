@@ -1,1 +1,1 @@
-# GitHub-helpers
+# GitHub-PSHelpers
