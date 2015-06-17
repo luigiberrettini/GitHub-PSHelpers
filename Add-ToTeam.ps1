@@ -26,7 +26,8 @@ function Add-UsersToTeam {
   $teams |  ? { $_.Team.Name -ne $TeamName } | % { $otherMembers += ($_.Members | Select-Object -ExpandProperty login) }
 
   $uniqueMembersToAdd = $otherMembers | Sort-Object -Unique | ? { $teamMembers -notcontains $_ }
-  Add-GitHubTeamMembership -Organization $Organization -TeamName $TeamName -UserNames $uniqueMembersToAdd
+  if ($uniqueMembersToAdd)
+    { Add-GitHubTeamMembership -Organization $Organization -TeamName $TeamName -UserNames $uniqueMembersToAdd }
 }
 
 function Add-ReposToTeam {
