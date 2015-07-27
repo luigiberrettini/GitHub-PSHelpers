@@ -89,8 +89,8 @@ function Add-RepoAsSubtree {
   Write-Output "`r`n-------------------- git read-tree --prefix=$DestinationPrefix/ -u $SourceRemoteName/master`r`n"
   git read-tree --prefix=$DestinationPrefix/ -u $SourceRemoteName/master
   
-  Write-Output "`r`n-------------------- git commit -m `'Merge $sourceRepoUrl as our subdirectory`'`r`n"
-  git add .
+  Write-Output "`r`n-------------------- git add . --all AND git commit -m `'Merge $sourceRepoUrl as our subdirectory`'`r`n"
+  git add . --all
   git commit -m ("Merge $sourceRepoUrl as our subdirectory")
   
   Write-Output "`r`n-------------------- git pull --no-rebase -s subtree $SourceRemoteName master`r`n"
@@ -98,6 +98,9 @@ function Add-RepoAsSubtree {
   
   Write-Output "`r`n-------------------- git push origin master`r`n"
   git push origin master
+  
+  Write-Output "`r`n-------------------- git remote rm $SourceRemoteName`r`n"
+  git remote rm $SourceRemoteName
   
   Write-Output "`r`n**************************************** END - $SourceRepoUrl`r`n"
 }
