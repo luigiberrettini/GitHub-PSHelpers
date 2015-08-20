@@ -42,6 +42,10 @@ function Add-ReposToTeam {
     $TeamName,
     
     [Parameter(Mandatory = $false)]
+    [string]
+    $Permission = 'none',
+
+    [Parameter(Mandatory = $false)]
     [string[]]
     $ExcludeReposOwnedBy = @()
   )
@@ -67,5 +71,5 @@ function Add-ReposToTeam {
   Get-GitHubRepositories -ForOrganization -Organization $Organization | Out-Null
   $global:GITHUB_API_OUTPUT |
     ? { $($_.owner.login) -eq $Organization -and $reposNotToBeAdded -notcontains $_.Name } |
-    % { Add-GitHubTeamRepo -Organization $Organization -TeamName $TeamName -RepoName $_.Name }
+    % { Add-GitHubTeamRepo -Organization $Organization -TeamName $TeamName -Permission $Permission -RepoName $_.Name }
 }
