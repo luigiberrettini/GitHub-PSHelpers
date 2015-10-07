@@ -70,6 +70,6 @@ function Add-ReposToTeam {
 
   Get-GitHubRepositories -ForOrganization -Organization $Organization | Out-Null
   $global:GITHUB_API_OUTPUT |
-    ? { $($_.owner.login) -eq $Organization -and $reposNotToBeAdded -notcontains $_.Name } |
+    ? { -not $_.Fork -and $($_.owner.login) -eq $Organization -and $reposNotToBeAdded -notcontains $_.Name } |
     % { Add-GitHubTeamRepo -Organization $Organization -TeamName $TeamName -Permission $Permission -RepoName $_.Name }
 }
