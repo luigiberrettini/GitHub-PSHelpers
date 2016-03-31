@@ -7,7 +7,11 @@ function Add-UsersToTeam {
 
     [Parameter(Mandatory = $true)]
     [string]
-    $TeamName
+    $TeamName,
+
+    [Parameter(Mandatory = $false)]
+    [string[]]
+    $ExcludeUsersBelongingTo = @()
   )
 
   if ([string]::IsNullOrEmpty($Organization))
@@ -19,13 +23,18 @@ function Add-UsersToTeam {
   Get-GitHubTeams $Organization | Out-Null
   $teams = $global:GITHUB_API_OUTPUT
 
-  $teamMembers = @()
-  $teams |  ? { $_.Team.Name -eq $TeamName } | % { $teamMembers += ($_.Members | Select-Object -ExpandProperty login) }
+  $teamsToExclude = @()
+  $teamsToExclude += $TeamName
+  $ExcludeUsersBelongingTo | % { $teamsToExclude += $_ }
+  $teamsToExclude = $teamsToExclude | Sort-Object -Unique
+
+  $membersToExclude = @()
+  $teams | ? { $_.Team.Name -in $teamsToExclude } | % { $membersToExclude += ($_.Members | Select-Object -ExpandProperty login) }
 
   $otherMembers = @()
   $teams |  ? { $_.Team.Name -ne $TeamName } | % { $otherMembers += ($_.Members | Select-Object -ExpandProperty login) }
 
-  $uniqueMembersToAdd = $otherMembers | Sort-Object -Unique | ? { $teamMembers -notcontains $_ }
+  $uniqueMembersToAdd = $otherMembers | Sort-Object -Unique | ? { $membersToExclude -notcontains $_ }
   if ($uniqueMembersToAdd)
     { Add-GitHubTeamMembership -Organization $Organization -TeamName $TeamName -UserNames $uniqueMembersToAdd }
 }
