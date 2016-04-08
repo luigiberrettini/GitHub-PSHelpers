@@ -69,3 +69,27 @@ function Get-NotRecentlyPushedOrgRepos {
     ? { $_.RepoNames.Length -gt 0 } |
     % { Write-Output $_.TeamName $_.RepoNames '' }
 }
+
+function Get-TopCommitter {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]
+    $Organization = $Env:GITHUB_ORG
+  )
+
+  if ([string]::IsNullOrEmpty($Organization))
+    { throw "An organization must be supplied"}
+
+  Get-GitHubRepositories -ForOrganization -Organization $Organization | Out-Null
+  $repos = $global:GITHUB_API_OUTPUT | ? { $($_.owner.login) -eq $Organization -and -not $_.Fork } | % { $_.name }
+  
+  $repoCommitsPerUser = @()
+  $repos |
+    % { $repoCommitsPerUser += Get-RepoCommitsPerUser -Organization $Organization -RepoName $_ }
+  
+  $commitsPerUser |
+    Group-Object Name |
+    Select-Object Name, @{Name="Number of commits"; Expression = { ($_.Group | Measure-Object Count -Sum).Sum  } } |
+    Format-Table -AutoSize
+}
