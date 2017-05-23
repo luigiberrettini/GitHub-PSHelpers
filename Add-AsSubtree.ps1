@@ -84,9 +84,9 @@ function Add-RepoAsSubtree {
   git remote add -f $SourceRemoteName $SourceRepoUrl
   
   Write-Output "`r`n-------------------- git merge -s ours --no-commit $SourceRemoteName/master`r`n"
-  git merge -s ours --no-commit $SourceRemoteName/master
+  git merge --allow-unrelated-histories -s ours --no-commit $SourceRemoteName/master
   
-  Write-Output "`r`n-------------------- git read-tree --prefix=$DestinationPrefix/ -u $SourceRemoteName/master`r`n"
+  Write-Output "`r`n-------------------- git read-tree --prefix=$DestinationPrefix\ -u $SourceRemoteName/master`r`n"
   git read-tree --prefix=$DestinationPrefix/ -u $SourceRemoteName/master
   
   Write-Output "`r`n-------------------- git add . --all AND git commit -m `'Merge $sourceRepoUrl as our subdirectory`'`r`n"
